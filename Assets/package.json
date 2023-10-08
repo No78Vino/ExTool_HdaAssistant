@@ -1,0 +1,19 @@
+{
+  "name": "com.exhard.extoolhdaassistant",
+  "version": "1.0.0",
+  "displayName": "HDA Assistant Tool",
+  "unity": "2021.3",
+  "description": "HDA Assistant Tool is a utility plugin that integrates Houdini Engine for Unity and provides assistance in using and managing HDA assets.",
+  "documentationUrl": "https://github.com/No78Vino/ExTool_HdaAssistant",
+  "dependencies": {},
+  "author": {
+    "name": "EX-Hard",
+    "email": "",
+    "url": "https://github.com/No78Vino"
+  },
+
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/No78Vino/ExTool_HdaAssistant.git"
+  }
+}
