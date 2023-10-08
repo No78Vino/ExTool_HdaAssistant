@@ -1,0 +1,16 @@
+{
+    "name": "HDAAssistantTool",
+    "rootNamespace": "",
+    "references": [
+        "GUID:9e3c273b93f3db44fa1765639ca5386a"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
