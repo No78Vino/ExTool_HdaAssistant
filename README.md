@@ -1,6 +1,7 @@
 # ExTool HDA助手（Unity版本）
 ## 介绍
 本插件自带集成了Sidfx官方的Houdini Engine For Unity（我挺奇怪的，Sidfx明明git仓库是公开的，但就是没做成package。搞得我不得不完整拷贝了一份进插件。）
+![AA)RNW3E$P%II~ J5V(~S4T](https://github.com/No78Vino/ExTool_HdaAssistant/assets/43328860/51ed3ce6-fbc9-4348-8365-e2dfa0554c8a)
 
 同时增加了以下可视化的操作：
 1. 加载HDA（包括工程内和工程外的hda，hdalc资源）
