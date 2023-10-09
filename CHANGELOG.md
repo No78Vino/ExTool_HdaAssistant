@@ -1,0 +1,3 @@
+# 2023.10.9
+自己用的时候发现了HoudiniEngine存在Valid Session但实际已经失效的情况。简单翻了一下HoudiniEngine源码，不知道怎么检测Session的真实
+连接情况，所以加了HEngine Session Sync的按钮接口，直接弹出会话同步的管理窗口。自行Disconnect,然后自行再connect houdini。
