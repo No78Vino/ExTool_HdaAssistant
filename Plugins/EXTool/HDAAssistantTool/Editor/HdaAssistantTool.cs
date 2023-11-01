@@ -1,9 +1,13 @@
+using System.Collections.Generic;
 using System.IO;
 using HoudiniEngineUnity;
+using Unity.Serialization.Json;
 using UnityEditor;
 using UnityEditor.SceneManagement;
+using UnityEditor.Scripting.Python;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using EventType = UnityEngine.EventType;
 
 namespace EXTool
 {
@@ -23,8 +27,8 @@ namespace EXTool
         private GameObject _replacedGameObject;
         private Vector2 _scrollPosition;
 
-        public static HEU_HoudiniAssetRoot CurrentHoudiniAssetRoot;
-        
+        private string _sppPath;
+
         private void OnEnable()
         {
             _previousScenePath = SceneManager.GetActiveScene().path;
@@ -135,7 +139,6 @@ namespace EXTool
                 _hdaGameObject.transform.localPosition = Vector3.zero;
                 _hdaGameObject.transform.localRotation = Quaternion.identity;
                 _houdiniAssetRoot = _hdaGameObject.GetComponent<HEU_HoudiniAssetRoot>();
-                CurrentHoudiniAssetRoot = _houdiniAssetRoot;
             }
         }
 
@@ -186,6 +189,17 @@ namespace EXTool
                         typeof(GameObject), true, GUILayout.ExpandWidth(true)) as GameObject;
 
                 if (GUILayout.Button("Replace Prefab/GameObject", buttonStyleBake)) ReplaceObject(_replacedGameObject);
+                EditorGUILayout.EndVertical();
+                
+                EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+                EditorGUILayout.LabelField("Spp Path:",
+                    new GUIStyle(GUI.skin.label) {alignment = TextAnchor.MiddleLeft},
+                    GUILayout.ExpandWidth(true));
+                _sppPath =
+                    EditorGUILayout.TextField("", _sppPath, GUILayout.ExpandWidth(true));
+                EditorGUILayout.Separator();
+                if (GUILayout.Button("Prepare Spp", buttonStyleBake)) PrepareSpp();
+                if (GUILayout.Button("Product Prefab", buttonStyleBake)) ProductHdaPrefab();
                 EditorGUILayout.EndVertical();
             }
 
@@ -379,6 +393,107 @@ namespace EXTool
         {
             var window = GetWindow(typeof(HEU_SessionSyncWindow), false, "HEngine SessionSync");
             window.ShowAuxWindow();
+        }
+
+        void PrepareSpp()
+        {
+            ProceduralModelingAutomation.PrepareSpp(_sppPath);
+        }
+        
+        string HdaParameters()
+        {
+            HEU_SessionManager.GetOrCreateDefaultSession();
+            HEU_HoudiniAssetRoot root = _houdiniAssetRoot;
+            var heuParm = root.HoudiniAsset.Parameters;
+            var datas = heuParm.GetParameters();
+            Dictionary<string, object> parameterDict = new Dictionary<string, object>();
+
+            // HAPI_PARMTYPE_MULTIPARMLIST,        
+            // HAPI_PARMTYPE_PATH_FILE_GEO,        
+            // HAPI_PARMTYPE_PATH_FILE_IMAGE,        
+            // HAPI_PARMTYPE_PATH_FILE_DIR,        
+            // HAPI_PARMTYPE_MAX,  
+
+            foreach (var p in datas)
+            {
+                switch (p._parmInfo.type)
+                {
+                    case HAPI_ParmType.HAPI_PARMTYPE_INT:
+                        if (p._intValues.Length > 1)
+                        {
+                            parameterDict.Add(p._name + 'x', p._intValues[0]);
+                            parameterDict.Add(p._name + 'y', p._intValues[1]);
+                            if (p._intValues.Length == 3)
+                            {
+                                parameterDict.Add(p._name + 'z', p._intValues[2]);
+                            }
+                        }
+                        else
+                        {
+                            parameterDict.Add(p._name, p._intValues[0]);
+                        }
+
+                        break;
+                    case HAPI_ParmType.HAPI_PARMTYPE_TOGGLE:
+                        parameterDict.Add(p._name, p._toggle);
+                        break;
+                    case HAPI_ParmType.HAPI_PARMTYPE_FLOAT:
+                        if (p._floatValues.Length > 1)
+                        {
+                            parameterDict.Add(p._name + 'x', p._floatValues[0]);
+                            parameterDict.Add(p._name + 'y', p._floatValues[1]);
+                            if (p._floatValues.Length == 3)
+                            {
+                                parameterDict.Add(p._name + 'z', p._floatValues[2]);
+                            }
+                        }
+                        else
+                        {
+                            parameterDict.Add(p._name, p._floatValues[0]);
+                        }
+
+                        break;
+                    case HAPI_ParmType.HAPI_PARMTYPE_COLOR:
+                        parameterDict.Add(p._name, p._color);
+                        break;
+                    case HAPI_ParmType.HAPI_PARMTYPE_STRING:
+                        parameterDict.Add(p._name, p._stringValues[0]);
+                        break;
+                    case HAPI_ParmType.HAPI_PARMTYPE_PATH_FILE:
+                        parameterDict.Add(p._name, p._stringValues[0]);
+                        break;
+                    case HAPI_ParmType.HAPI_PARMTYPE_NODE:
+                        parameterDict.Add(p._name, p._paramInputNode);
+                        break;
+                }
+            }
+
+            string json = JsonSerialization.ToJson(parameterDict);
+            return json;
+        }
+
+        
+        void ProductHdaPrefab()
+        {
+            string pythonCode = $"import sys; " +
+                                $"sys.path.append(r'{AutomationSetting.PathOfHouModule}');" +
+                                $"sys.path.append(r'{AutomationSetting.PathOfSitePackages}');";
+
+            PythonRunner.RunString(pythonCode);
+
+            string parameters = HdaParameters();
+            string testLoadHdaNode =
+                "import hrpyc;" +
+                "connection, hou = hrpyc.import_remote_module();" +
+                "obj_node = hou.node('/obj');" +
+                "geo_node = obj_node.createNode('geo','geo_my_hda_node');" +
+                $"hou.hda.installFile('{_hdaPath}');" +
+                "hda_node_name = 'gpt_gen_shop_slogan_board';" +
+                "hda_instance = geo_node.createNode(hda_node_name,'my_hda_node');" +
+                $"hda_instance.setParms({parameters});" +
+                "execution_param = hda_instance.parm('newparameter');" +
+                "execution_param.pressButton();";
+            PythonRunner.RunString(testLoadHdaNode);
         }
     }
 }
