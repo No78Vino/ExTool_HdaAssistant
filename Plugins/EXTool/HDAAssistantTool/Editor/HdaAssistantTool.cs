@@ -23,6 +23,8 @@ namespace EXTool
         private GameObject _replacedGameObject;
         private Vector2 _scrollPosition;
 
+        public static HEU_HoudiniAssetRoot CurrentHoudiniAssetRoot;
+        
         private void OnEnable()
         {
             _previousScenePath = SceneManager.GetActiveScene().path;
@@ -133,6 +135,7 @@ namespace EXTool
                 _hdaGameObject.transform.localPosition = Vector3.zero;
                 _hdaGameObject.transform.localRotation = Quaternion.identity;
                 _houdiniAssetRoot = _hdaGameObject.GetComponent<HEU_HoudiniAssetRoot>();
+                CurrentHoudiniAssetRoot = _houdiniAssetRoot;
             }
         }
 
