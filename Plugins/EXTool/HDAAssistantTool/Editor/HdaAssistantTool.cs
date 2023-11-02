@@ -199,6 +199,16 @@ namespace EXTool
                     EditorGUILayout.TextField("", _sppPath, GUILayout.ExpandWidth(true));
                 EditorGUILayout.Separator();
                 if (GUILayout.Button("Prepare Spp", buttonStyleBake)) PrepareSpp();
+                
+                EditorGUILayout.Space(10);
+                
+                EditorGUILayout.LabelField("Folder Name:",
+                    new GUIStyle(GUI.skin.label) {alignment = TextAnchor.MiddleLeft},
+                    GUILayout.ExpandWidth(true));
+                ProceduralModelingAutomation.FolderName =
+                    EditorGUILayout.TextField("", ProceduralModelingAutomation.FolderName, GUILayout.ExpandWidth(true));
+                EditorGUILayout.Separator();
+                
                 if (GUILayout.Button("Product Prefab", buttonStyleBake)) ProductHdaPrefab();
                 EditorGUILayout.EndVertical();
             }
