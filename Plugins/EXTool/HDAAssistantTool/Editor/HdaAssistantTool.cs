@@ -486,8 +486,8 @@ namespace EXTool
         void ProductHdaPrefab()
         {
             string pythonCode = $"import sys; " +
-                                $"sys.path.append(r'{AutomationSetting.PathOfHouModule}');" +
-                                $"sys.path.append(r'{AutomationSetting.PathOfSitePackages}');";
+                                $"sys.path.append(r'{ExMaidSetting.PathOfHouModule}');" +
+                                $"sys.path.append(r'{ExMaidSetting.PathOfSitePackages}');";
 
             PythonRunner.RunString(pythonCode);
 
