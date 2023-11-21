@@ -223,7 +223,6 @@ namespace EXTool
                 hover = new GUIStyleState {textColor = Color.red}
             };
             if (GUILayout.Button("Reset", buttonStyleClearScene)) ResetScene();
-            if (GUILayout.Button("HEngine Session Sync", buttonStyleClearScene)) OpenHEngineSessionSync();
             if (GUILayout.Button("Clear HDA Cache", buttonStyleClearScene)) ClearHdaCache();
             GUILayout.Space(10);
             EditorGUILayout.EndVertical();
@@ -397,12 +396,6 @@ namespace EXTool
                     AssetDatabase.Refresh();
                 }
             }
-        }
-
-        void OpenHEngineSessionSync()
-        {
-            var window = GetWindow(typeof(HEU_SessionSyncWindow), false, "HEngine SessionSync");
-            window.ShowAuxWindow();
         }
 
         void PrepareSpp()

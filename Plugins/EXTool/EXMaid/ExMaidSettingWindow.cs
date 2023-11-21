@@ -36,7 +36,15 @@ namespace EXTool
             OnGUIDrawSocketSetting();
             GUILayout.Space(10);
             OnGUIExMaid();
-            if (GUILayout.Button("Save")) SaveDirectories();
+            
+            GUILayout.FlexibleSpace();
+            var buttonStyleClearScene = new GUIStyle(GUI.skin.button)
+            {
+                fontSize = 17,
+                fontStyle = FontStyle.Bold,
+                border = new RectOffset(2, 2, 5, 5),
+            };
+            if (GUILayout.Button("Save",buttonStyleClearScene)) SaveDirectories();
         }
 
         private void OnGUIDrawSubPainterSetting()
@@ -141,7 +149,7 @@ namespace EXTool
             EditorGUILayout.EndVertical();
         }
         
-        [MenuItem("EXTool/EX Maid Setting")]
+        [MenuItem("EXTool/EX Maid Setting",priority = 0)]
         public static void ShowWindow()
         {
             GetWindow(typeof(ExMaidSettingWindow), false, "EX Maid Setting");
