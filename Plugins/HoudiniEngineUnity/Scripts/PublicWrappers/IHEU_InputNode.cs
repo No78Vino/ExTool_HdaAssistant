@@ -64,10 +64,13 @@ namespace HoudiniEngineUnity
 	HDA,
 	UNITY_MESH,
 	CURVE,
+#if UNITY_2022_1_OR_NEWER
+	SPLINE,
+#endif
 	TERRAIN,
 	BOUNDING_BOX,
 	TILEMAP
-    };
+	};
 
     /// <summary>
     /// Holds all parameter data for an asset.
@@ -110,6 +113,9 @@ namespace HoudiniEngineUnity
 
 	/// <summary>Tilemap settings</summary>
 	HEU_InputInterfaceTilemapSettings TilemapSettings { get; }
+
+	/// <summary>Spline settings</summary>
+	HEU_InputInterfaceSplineSettings SplineSettings { get; }
 
 	/// <summary>
 	/// Whether or not this is an asset input

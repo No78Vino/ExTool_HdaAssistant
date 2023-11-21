@@ -387,6 +387,7 @@ namespace HoudiniEngineUnity
         HAPI_STORAGETYPE_UINT8,        
         HAPI_STORAGETYPE_INT8,        
         HAPI_STORAGETYPE_INT16,        
+        HAPI_STORAGETYPE_DICTIONARY,        
         HAPI_STORAGETYPE_INT_ARRAY,        
         HAPI_STORAGETYPE_INT64_ARRAY,        
         HAPI_STORAGETYPE_FLOAT_ARRAY,        
@@ -395,6 +396,7 @@ namespace HoudiniEngineUnity
         HAPI_STORAGETYPE_UINT8_ARRAY,        
         HAPI_STORAGETYPE_INT8_ARRAY,        
         HAPI_STORAGETYPE_INT16_ARRAY,        
+        HAPI_STORAGETYPE_DICTIONARY_ARRAY,        
         HAPI_STORAGETYPE_MAX,        
     };
 
@@ -549,7 +551,7 @@ namespace HoudiniEngineUnity
         HAPI_CACHEPROP_MIN,        //Min cache memory limit in MB.
         HAPI_CACHEPROP_HAS_MAX,        //True if it actually has a maximum size.
         HAPI_CACHEPROP_MAX,        //Max cache memory limit in MB.
-        HAPI_CACHEPROP_CULL_LEVEL,        //How aggressive to cull memory. This only works for:- HAPI_CACHE_COP_COOK where:0 -> Never reduce inactive cache.1 -> Always reduce inactive cache.- HAPI_CACHE_OBJ where:0 -> Never enforce the max memory limit.1 -> Always enforce the max memory limit.- HAPI_CACHE_SOP where:0 -> When to Unload = NeverWhen to Limit Max Memory = Never1-2 -> When to Unload = Based on FlagWhen to Limit Max Memory = Never3-4 -> When to Unload = Based on FlagWhen to Limit Max Memory = Always5 -> When to Unload = AlwaysWhen to Limit Max Memory = Always
+        HAPI_CACHEPROP_CULL_LEVEL,        //How aggressive to cull memory. This only works for:- HAPI_CACHE_COP2_COOK where:0 -> Never reduce inactive cache.1 -> Always reduce inactive cache.- HAPI_CACHE_OBJ where:0 -> Never enforce the max memory limit.1 -> Always enforce the max memory limit.- HAPI_CACHE_SOP where:0 -> When to Unload = NeverWhen to Limit Max Memory = Never1-2 -> When to Unload = Based on FlagWhen to Limit Max Memory = Never3-4 -> When to Unload = Based on FlagWhen to Limit Max Memory = Always5 -> When to Unload = AlwaysWhen to Limit Max Memory = Always
     };
 
     public enum HAPI_HeightFieldSampling          //Type of sampling for heightfield
@@ -589,6 +591,7 @@ namespace HoudiniEngineUnity
         HAPI_PDG_EVENT_NODE_RENAME,        //Sent when a node was renamed
         HAPI_PDG_EVENT_NODE_CONNECT,        //Sent when a node was connected to another node
         HAPI_PDG_EVENT_NODE_DISCONNECT,        //Sent when a node is disconnected from another node
+        HAPI_PDG_EVENT_NODE_FIRST_COOK,        //Sent when a node cooks for the first time
         HAPI_PDG_EVENT_WORKITEM_SET_INT,        //Deprecated
         HAPI_PDG_EVENT_WORKITEM_SET_FLOAT,        //Deprecated
         HAPI_PDG_EVENT_WORKITEM_SET_STRING,        //Deprecated
