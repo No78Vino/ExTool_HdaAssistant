@@ -5,6 +5,12 @@ namespace EXTool
 {
     public static class ExMaidSetting
     {
+        public enum MaidMode
+        {
+            Normal,
+            HouAndSubPt
+        }
+
         public static readonly string EditorPrefsNameOfHoudiniPath = "directoryOfHoudini";
         public static readonly string EditorPrefsNameOfSubPtPath = "directoryOfSubstancePainter";
         public static readonly string EditorPrefsNameOfPort = "portOfUnityServer";
@@ -74,13 +80,6 @@ namespace EXTool
 
         public static void ClearRecorder()
         {
-            
-        }
-        
-        public enum MaidMode
-        {
-            Normal,
-            HouAndSubPt
         }
     }
 }

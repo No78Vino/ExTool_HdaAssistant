@@ -28,6 +28,7 @@ namespace EXTool
         private Vector2 _scrollPosition;
 
         private string _sppPath;
+        private ExMaidSetting.MaidMode _maidMode;
 
         private readonly GUIStyle _buttonStyleA = new GUIStyle(GUI.skin.button)
         {
@@ -221,8 +222,14 @@ namespace EXTool
 
             if (_houdiniAssetRootEditor)
             {
-                OnGUI_ForNormal();
-                OnGUI_AutoForHouAndSubPt();
+                // _maidMode = (ExMaidSetting.MaidMode) EditorGUILayout.EnumPopup(_maidMode);
+                // if (_maidMode == ExMaidSetting.MaidMode.Normal)
+                // {
+                //     OnGUI_ForNormal();
+                // }else if (_maidMode == ExMaidSetting.MaidMode.HouAndSubPt)
+                // {
+                //     OnGUI_AutoForHouAndSubPt();
+                // }
             }
 
             GUILayout.FlexibleSpace();
