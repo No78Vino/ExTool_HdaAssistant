@@ -76,5 +76,11 @@ namespace EXTool
         {
             
         }
+        
+        public enum MaidMode
+        {
+            Normal,
+            HouAndSubPt
+        }
     }
 }
