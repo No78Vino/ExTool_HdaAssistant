@@ -224,7 +224,11 @@ namespace EXTool
 
             if (_houdiniAssetRootEditor)
             {
+                GUILayout.BeginHorizontal(EditorStyles.helpBox);
+                EditorGUILayout.LabelField("EXMaid Mode",EditorStyles.boldLabel, GUILayout.Width(100));
                 _maidMode = (ExMaidSetting.MaidMode) EditorGUILayout.EnumPopup(_maidMode);
+                GUILayout.EndHorizontal();
+                
                 if (_maidMode == ExMaidSetting.MaidMode.Normal)
                 {
                     OnGUI_ForNormal();
@@ -235,7 +239,10 @@ namespace EXTool
             }
 
             GUILayout.FlexibleSpace();
-            if (GUILayout.Button("Reset", _buttonStyleB)) ResetScene();
+            if (GUILayout.Button("Reset", _buttonStyleB))
+            {
+                ResetScene();
+            }
             if (GUILayout.Button("Clear HDA Cache", _buttonStyleB))
             {
                 HdaUtil.ClearHdaCache();
