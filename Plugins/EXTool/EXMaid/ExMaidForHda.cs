@@ -30,24 +30,8 @@ namespace EXTool
         private string _sppPath;
         private ExMaidSetting.MaidMode _maidMode;
 
-        private readonly GUIStyle _buttonStyleA = new GUIStyle(GUI.skin.button)
-        {
-            fontSize = 15,
-            fontStyle = FontStyle.Bold,
-            border = new RectOffset(2, 2, 5, 5),
-            normal = new GUIStyleState {textColor = Color.white},
-            hover = new GUIStyleState {textColor = Color.green}
-        };
+        private  GUIStyle _buttonStyleA, _buttonStyleB;
 
-        private readonly GUIStyle _buttonStyleB = new GUIStyle(GUI.skin.button)
-        {
-            fontSize = 17,
-            fontStyle = FontStyle.Bold,
-            border = new RectOffset(2, 2, 5, 5),
-            normal = new GUIStyleState {textColor = Color.white},
-            hover = new GUIStyleState {textColor = Color.red}
-        };
-        
         private void OnEnable()
         {
             _previousScenePath = SceneManager.GetActiveScene().path;
@@ -61,6 +45,24 @@ namespace EXTool
 
         private void OnGUI()
         {
+            _buttonStyleA = new GUIStyle(GUI.skin.button)
+            {
+                fontSize = 15,
+                fontStyle = FontStyle.Bold,
+                border = new RectOffset(2, 2, 5, 5),
+                normal = new GUIStyleState {textColor = Color.white},
+                hover = new GUIStyleState {textColor = Color.green}
+            };
+
+            _buttonStyleB = new GUIStyle(GUI.skin.button)
+            {
+                fontSize = 17,
+                fontStyle = FontStyle.Bold,
+                border = new RectOffset(2, 2, 5, 5),
+                normal = new GUIStyleState {textColor = Color.white},
+                hover = new GUIStyleState {textColor = Color.red}
+            };
+            
             EditorGUILayout.BeginHorizontal();
             OnGUI_Left_FunctionButtonGroup();
             EditorGUILayout.Separator();
@@ -107,11 +109,11 @@ namespace EXTool
             while (Time.realtimeSinceStartup - startTime < duration)
             {
                 var progress = (Time.realtimeSinceStartup - startTime) / duration;
-                var canncel =
+                var cancel =
                     EditorUtility.DisplayCancelableProgressBar("Waiting For SESSION CONNECTION...",
                         "Please wait.", progress);
                 var session = HEU_SessionManager.GetOrCreateDefaultSession();
-                if (canncel ||
+                if (cancel ||
                     session.ConnectionState == SessionConnectionState.CONNECTED ||
                     session.ConnectionState == SessionConnectionState.FAILED_TO_CONNECT)
                     break;
@@ -222,19 +224,22 @@ namespace EXTool
 
             if (_houdiniAssetRootEditor)
             {
-                // _maidMode = (ExMaidSetting.MaidMode) EditorGUILayout.EnumPopup(_maidMode);
-                // if (_maidMode == ExMaidSetting.MaidMode.Normal)
-                // {
-                //     OnGUI_ForNormal();
-                // }else if (_maidMode == ExMaidSetting.MaidMode.HouAndSubPt)
-                // {
-                //     OnGUI_AutoForHouAndSubPt();
-                // }
+                _maidMode = (ExMaidSetting.MaidMode) EditorGUILayout.EnumPopup(_maidMode);
+                if (_maidMode == ExMaidSetting.MaidMode.Normal)
+                {
+                    OnGUI_ForNormal();
+                }else if (_maidMode == ExMaidSetting.MaidMode.HouAndSubPt)
+                {
+                    OnGUI_AutoForHouAndSubPt();
+                }
             }
 
             GUILayout.FlexibleSpace();
             if (GUILayout.Button("Reset", _buttonStyleB)) ResetScene();
-            if (GUILayout.Button("Clear HDA Cache", _buttonStyleB)) ClearHdaCache();
+            if (GUILayout.Button("Clear HDA Cache", _buttonStyleB))
+            {
+                HdaUtil.ClearHdaCache();
+            }
             GUILayout.Space(10);
             EditorGUILayout.EndVertical();
         }
@@ -318,34 +323,7 @@ namespace EXTool
             EditorGUILayout.EndScrollView();
             EditorGUILayout.EndVertical();
         }
-
-        [MenuItem("EXTool/Houdini/Clear HDA Cache")]
-        public static void ClearHdaCache()
-        {
-            var confirm = EditorUtility.DisplayDialog("Warning",
-                "Make Sure Clear HDA Cache?", "yes", "no");
-
-            if (confirm)
-            {
-                var clearAll = EditorUtility.DisplayDialog("Warning",
-                    "Clear ALL or Only Working Part?",
-                    "ALL",
-                    "Only Working Part");
-                if (clearAll)
-                {
-                    var hdaCachePath = HEU_AssetDatabase.GetAssetCachePath();
-                    FileUtil.DeleteFileOrDirectory(hdaCachePath);
-                    AssetDatabase.Refresh();
-                }
-                else
-                {
-                    var hdaCacheWorkingPartPath = HEU_AssetDatabase.GetAssetWorkingPath();
-                    FileUtil.DeleteFileOrDirectory(hdaCacheWorkingPartPath);
-                    AssetDatabase.Refresh();
-                }
-            }
-        }
-
+        
         private void PrepareSpp()
         {
             ProceduralModelingAutomation.PrepareSpp(_sppPath);

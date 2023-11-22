@@ -9,6 +9,33 @@ namespace EXTool.Util
 {
     public static class HdaUtil
     {
+        [MenuItem("EXTool/Houdini/Clear HDA Cache",priority = 1,secondaryPriority = 3)]
+        public static void ClearHdaCache()
+        {
+            var confirm = EditorUtility.DisplayDialog("Warning",
+                "Make Sure Clear HDA Cache?", "yes", "no");
+
+            if (confirm)
+            {
+                var clearAll = EditorUtility.DisplayDialog("Warning",
+                    "Clear ALL or Only Working Part?",
+                    "ALL",
+                    "Only Working Part");
+                if (clearAll)
+                {
+                    var hdaCachePath = HEU_AssetDatabase.GetAssetCachePath();
+                    FileUtil.DeleteFileOrDirectory(hdaCachePath);
+                    AssetDatabase.Refresh();
+                }
+                else
+                {
+                    var hdaCacheWorkingPartPath = HEU_AssetDatabase.GetAssetWorkingPath();
+                    FileUtil.DeleteFileOrDirectory(hdaCacheWorkingPartPath);
+                    AssetDatabase.Refresh();
+                }
+            }
+        }
+        
         public static GameObject ImportHda(string hdaPath)
         {
             // Check Hda Path
