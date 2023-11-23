@@ -1,20 +1,18 @@
-using System.Collections.Generic;
-using System.IO;
 using EXTool.Util;
 using HoudiniEngineUnity;
-using Unity.Serialization.Json;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEditor.Scripting.Python;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using EventType = UnityEngine.EventType;
 
 namespace EXTool
 {
     public class ExMaidForHda : EditorWindow
     {
         private static readonly float buttonColumnWidth = 300f;
+
+        private GUIStyle _buttonStyleA, _buttonStyleB;
         private string _exportBakePath;
         private GameObject _hdaGameObject;
         private Object _hdaObject;
@@ -22,15 +20,13 @@ namespace EXTool
         private string _hdaPath;
         private HEU_HoudiniAssetRoot _houdiniAssetRoot; // Cache of HEU_HoudiniAssetRoot
         private Editor _houdiniAssetRootEditor; // Inspector Editor of HEU_HoudiniAssetRoot
+        private ExMaidSetting.MaidMode _maidMode;
 
         private string _previousScenePath;
         private GameObject _replacedGameObject;
         private Vector2 _scrollPosition;
 
         private string _sppPath;
-        private ExMaidSetting.MaidMode _maidMode;
-
-        private  GUIStyle _buttonStyleA, _buttonStyleB;
 
         private void OnEnable()
         {
@@ -62,7 +58,7 @@ namespace EXTool
                 normal = new GUIStyleState {textColor = Color.white},
                 hover = new GUIStyleState {textColor = Color.red}
             };
-            
+
             EditorGUILayout.BeginHorizontal();
             OnGUI_Left_FunctionButtonGroup();
             EditorGUILayout.Separator();
@@ -70,7 +66,7 @@ namespace EXTool
             EditorGUILayout.EndHorizontal();
         }
 
-        [MenuItem("EXTool/Houdini/HDA Assistant Tool")]
+        [MenuItem("EXTool/EX Maid/For HDA", priority = 1)]
         public static void ShowWindow()
         {
             var session = HEU_SessionManager.GetOrCreateDefaultSession();
@@ -160,20 +156,33 @@ namespace EXTool
             SceneManager.SetActiveScene(newScene);
         }
 
-        void OnGUI_AutoForHouAndSubPt()
+        private void OnGUI_AutoForHouAndSubPt()
         {
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+            string info =
+                "Please ensure that the content of the HDA and SPP files adhere to the following specifications:\n" +
+                "1. The HDA is intended for the production of a single model.\n" +
+                "2. The HDA's outputs consist of three ports in sequence:\n" +
+                "    the final model, \n" +
+                "    the low-resolution model for baking (including the material ID map),\n " +
+                "    the high-resolution model for baking\n" +
+                "3. The SPP project file has already completed the material distribution for the material ID map.";
+            
+            EditorGUILayout.HelpBox(info,MessageType.Info);
+            
             EditorGUILayout.LabelField("Spp Path:",
                 new GUIStyle(GUI.skin.label) {alignment = TextAnchor.MiddleLeft},
                 GUILayout.ExpandWidth(true));
-            _sppPath =
-                EditorGUILayout.TextField("", _sppPath, GUILayout.ExpandWidth(true));
-            EditorGUILayout.Separator();
-            if (GUILayout.Button("Prepare Spp", _buttonStyleA)) PrepareSpp();
+            
+            _sppPath = EditorGUILayout.TextField(_sppPath);
+            if (GUILayout.Button("Browse", GUILayout.Width(80)))
+                _sppPath =
+                    EditorUtility.OpenFilePanel("Select spp File Path", "", "spp");
+            GUILayout.EndHorizontal();
+            //
+            //if (GUILayout.Button("Prepare Spp", _buttonStyleA)) PrepareSpp();
 
-            EditorGUILayout.Space(10);
-
-            EditorGUILayout.LabelField("Folder Name:",
+            EditorGUILayout.LabelField("Folder Path:",
                 new GUIStyle(GUI.skin.label) {alignment = TextAnchor.MiddleLeft},
                 GUILayout.ExpandWidth(true));
             ProceduralModelingAutomation.FolderName =
@@ -183,8 +192,8 @@ namespace EXTool
             if (GUILayout.Button("Product Prefab", _buttonStyleA)) ProductHdaPrefab();
             EditorGUILayout.EndVertical();
         }
-        
-        void OnGUI_ForNormal()
+
+        private void OnGUI_ForNormal()
         {
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
             EditorGUILayout.LabelField("Bake Path:",
@@ -193,10 +202,7 @@ namespace EXTool
             _exportBakePath =
                 EditorGUILayout.TextField("", _exportBakePath, GUILayout.ExpandWidth(true));
             EditorGUILayout.Separator();
-            if (GUILayout.Button("Bake", _buttonStyleA))
-            {
-                HdaUtil.BakeHda(_exportBakePath,_houdiniAssetRoot);
-            }
+            if (GUILayout.Button("Bake", _buttonStyleA)) HdaUtil.BakeHda(_exportBakePath, _houdiniAssetRoot);
             EditorGUILayout.EndVertical();
 
             EditorGUILayout.Space(10);
@@ -209,12 +215,10 @@ namespace EXTool
                     typeof(GameObject), true, GUILayout.ExpandWidth(true)) as GameObject;
 
             if (GUILayout.Button("Replace Prefab/GameObject", _buttonStyleA))
-            {
-                HdaUtil.HdaReplaceObject(_replacedGameObject,_houdiniAssetRoot);
-            }
+                HdaUtil.HdaReplaceObject(_replacedGameObject, _houdiniAssetRoot);
             EditorGUILayout.EndVertical();
         }
-        
+
         private void OnGUI_Left_FunctionButtonGroup()
         {
             EditorGUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.Width(buttonColumnWidth));
@@ -225,28 +229,18 @@ namespace EXTool
             if (_houdiniAssetRootEditor)
             {
                 GUILayout.BeginHorizontal(EditorStyles.helpBox);
-                EditorGUILayout.LabelField("EXMaid Mode",EditorStyles.boldLabel, GUILayout.Width(100));
+                EditorGUILayout.LabelField("EXMaid Mode", EditorStyles.boldLabel, GUILayout.Width(100));
                 _maidMode = (ExMaidSetting.MaidMode) EditorGUILayout.EnumPopup(_maidMode);
                 GUILayout.EndHorizontal();
-                
+
                 if (_maidMode == ExMaidSetting.MaidMode.Normal)
-                {
                     OnGUI_ForNormal();
-                }else if (_maidMode == ExMaidSetting.MaidMode.HouAndSubPt)
-                {
-                    OnGUI_AutoForHouAndSubPt();
-                }
+                else if (_maidMode == ExMaidSetting.MaidMode.HouAndSubPt) OnGUI_AutoForHouAndSubPt();
             }
 
             GUILayout.FlexibleSpace();
-            if (GUILayout.Button("Reset", _buttonStyleB))
-            {
-                ResetScene();
-            }
-            if (GUILayout.Button("Clear HDA Cache", _buttonStyleB))
-            {
-                HdaUtil.ClearHdaCache();
-            }
+            if (GUILayout.Button("Reset", _buttonStyleB)) ResetScene();
+            if (GUILayout.Button("Clear HDA Cache", _buttonStyleB)) HdaUtil.ClearHdaCache();
             GUILayout.Space(10);
             EditorGUILayout.EndVertical();
         }
@@ -330,7 +324,7 @@ namespace EXTool
             EditorGUILayout.EndScrollView();
             EditorGUILayout.EndVertical();
         }
-        
+
         private void PrepareSpp()
         {
             ProceduralModelingAutomation.PrepareSpp(_sppPath);

@@ -9,7 +9,7 @@ namespace EXTool.Util
 {
     public static class HdaUtil
     {
-        [MenuItem("EXTool/Houdini/Clear HDA Cache",priority = 1,secondaryPriority = 3)]
+        [MenuItem("EXTool/Houdini/Clear HDA Cache")]
         public static void ClearHdaCache()
         {
             var confirm = EditorUtility.DisplayDialog("Warning",
