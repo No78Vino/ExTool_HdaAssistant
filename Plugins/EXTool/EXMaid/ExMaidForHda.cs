@@ -10,7 +10,7 @@ namespace EXTool
 {
     public class ExMaidForHda : EditorWindow
     {
-        private static readonly float buttonColumnWidth = 300f;
+        private const float BUTTON_COLUMN_WIDTH = 300f;
 
         private GUIStyle _buttonStyleA, _buttonStyleB;
         private string _exportBakePath;
@@ -221,7 +221,7 @@ namespace EXTool
 
         private void OnGUI_Left_FunctionButtonGroup()
         {
-            EditorGUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.Width(buttonColumnWidth));
+            EditorGUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.Width(BUTTON_COLUMN_WIDTH));
 
             OnGUI_LoadHDA();
             EditorGUILayout.Separator();
